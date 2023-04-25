@@ -1,4 +1,5 @@
 import discord
+import os
 
 client = discord.Client()
 
@@ -11,4 +12,4 @@ async def on_message(message):
     if message.content.startswith('!hello'):
         await message.channel.send('Hello!')
 
-client.run('your-bot-token-goes-here')
+client.run(os.getenv('DISCORD_TOKEN'))
