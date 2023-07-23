@@ -422,7 +422,7 @@ async def on_message(message):
 
         # Use the OpenAI API to generate a response
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
@@ -447,12 +447,12 @@ async def on_message(message):
 
         # Use the OpenAI API to generate a response
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a creative assistant that generates content appropriate for the given genre and subject type."},
-                {"role": "user", "content": f"I need ten names for a {subject_type} in a {genre} setting. Please include markdown so that the response will be formatted well as a discord message."}
+                {"role": "system", "content": "You are a creative writing assistant and expert with the meanings and sounds of names."},
+                {"role": "user", "content": f"Please generate ten names for a(n) {subject_type} in a genre like {genre}. Please include markdown formatting such that the response will be formatted well as a discord message."}
             ],
-            temperature=0.75,
+            temperature=0.8,
             max_tokens=500
         )
 
@@ -472,13 +472,13 @@ async def on_message(message):
 
         # Construct the chat message
         chat_message = [
-            {"role": "system", "content": f"You are a helpful assistant that's going to generate an NPC description and a physical description for an NPC of type {npc_type} in a {genre} setting."},
-            {"role": "user", "content": f"Please provide a detailed character description and a concise physical description for a(n) {npc_type} in a {genre} setting. For the character description, provide a brief overview of their background, personality, and role. For the physical description, be very concise and focus on the most notable features, do not include their name, and format the text for use with an AI image generator tool. Please format your responses as follows:\n\nCharacter Description: [Your response here]\n\nPhysical Description: [Your response here]"}
+            {"role": "system", "content": "You are an expert character designer. Your role is to generate a unique and interesting character description appropriate for the genre or scenario provided"},
+            {"role": "user", "content": f"Please provide a detailed character description and a concise physical description following the parameters provided. NPC Description: {npc_type}. Genre Description: {genre}. For the character description, provide a brief overview of their name, background, personality, role, and any other short and interesting information. For the physical description, be very concise and focus on the most notable features, do not include their name, and format the text for use with an AI image generator tool. Please format your responses as follows:\n\nCharacter Description: [Your response here]\n\nPhysical Description: [Your response here]"}
         ]
 
         # Call the OpenAI API
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=chat_message,
             max_tokens=500,
             temperature=0.75
@@ -516,17 +516,38 @@ async def on_message(message):
 
         # Use the OpenAI API to generate a response
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a creative assistant that generates detailed descriptions of fantastic locations suitable for the given genre."},
-                {"role": "user", "content": f"I need a description for a location that incorporates {location_info} in a {genre} setting. Please generate a detailed and interesting location and format it using markdown for readability. Be concise. In a new paragraph provide a short but detailed description of an ultra realistic digital painting of the location. Format the response as follows: ```/imagine prompt: [your description], ultra realistic --ar 16:9```"}
+                {"role": "user", "content": f"I need a description for a location that incorporates '{location_info}' in a '{genre}' style setting. Please generate a detailed and interesting location and use markdown formatting, such that it will look good as a discord message. Be concise. In a new paragraph provide a short but detailed description of a painting or photo of the location. Format the response as follows: ```/imagine prompt: [your description] --ar 16:9```"}
             ],
-            temperature=0.75,
+            temperature=0.6,
             max_tokens=500
         )
 
         # Send the AI's response as a message
         await message.channel.send(response['choices'][0]['message']['content'])
+
+    # Check if the message starts with "/quotation"
+    elif message.content.startswith('/quotation'):
+        # Get the genre and description from the message
+        _, genre, *description_parts = message.content.split()
+        description = ' '.join(description_parts)
+
+        # Use the OpenAI API to generate a quote
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that generates quotes. The genre can be anything from a role-playing game setting to a historical period or a type of fiction."},
+                {"role": "user", "content": f"Generate a {genre} quote about {description}."}
+            ],
+            max_tokens=500,
+            temperature=0.85
+        )
+
+        # Send the AI's response as a message
+        await message.channel.send(response['choices'][0]['message']['content'])
+
 
 
 @client.event
